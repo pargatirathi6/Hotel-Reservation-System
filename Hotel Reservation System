@@ -1,0 +1,161 @@
+Task4
+Hotel Reservation System
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+// Class representing a Room in the hotel
+class Room {
+    private int roomNumber;
+    private String category;
+    private boolean isAvailable;
+    private double price;
+    public Room(int roomNumber, String category, double price) {
+        this.roomNumber = roomNumber;
+        this.category = category;
+        this.isAvailable = true;
+        this.price = price;
+    }
+    public int getRoomNumber() {
+        return roomNumber;
+    }
+    public String getCategory() {
+        return category;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+    public void bookRoom() {
+        this.isAvailable = false;
+    }
+
+    // Method to release the room (for example, when canceled)
+    public void releaseRoom() {
+        this.isAvailable = true;
+    }
+    public String toString() {
+        return "Room " + roomNumber + " (" + category + ") - Price: $" + price + " - Available: " + (isAvailable ? "Yes" : "No");
+    }
+}
+class Reservation {
+    private String guestName;
+    private Room reservedRoom;
+    private double totalAmount;
+    public Reservation(String guestName, Room reservedRoom) {
+        this.guestName = guestName;
+        this.reservedRoom = reservedRoom;
+        this.totalAmount = reservedRoom.getPrice();
+    }
+
+    // Method to confirm the reservation and make the payment
+    public void confirmReservation() {
+        System.out.println("Reservation confirmed for " + guestName + " in room " + reservedRoom.getRoomNumber());
+        System.out.println("Total amount to be paid: $" + totalAmount);
+    }
+    public String toString() {
+        return guestName + " reserved " + reservedRoom.toString();
+    }
+}
+public class HotelReservationSystem {
+    private List<Room> rooms = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public HotelReservationSystem() {
+        rooms.add(new Room(103, "Single", 100.0));
+        rooms.add(new Room(104, "Single", 120.0));
+        rooms.add(new Room(105, "Double", 150.0));
+        rooms.add(new Room(106, "Double", 160.0));
+        rooms.add(new Room(107, "Suite", 250.0));
+    }
+    public void displayAvailableRooms() {
+        System.out.println("Available Rooms:");
+        for (Room room : rooms) {
+            if (room.isAvailable()) {
+                System.out.println(room);
+            }
+        }
+    }
+    public boolean searchRoom(String category) {
+        for (Room room : rooms) {
+            if (room.getCategory().equalsIgnoreCase(category) && room.isAvailable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void makeReservation(String guestName, String category) {
+        for (Room room : rooms) {
+            if (room.getCategory().equalsIgnoreCase(category) && room.isAvailable()) {
+                room.bookRoom();
+                Reservation reservation = new Reservation(guestName, room);
+                reservations.add(reservation);
+                reservation.confirmReservation();
+                return;
+            }
+        }
+        System.out.println("No available rooms found in this category.");
+    }
+
+    public void viewReservations() {
+        if (reservations.isEmpty()) {
+            System.out.println("No reservations found.");
+        } else {
+            System.out.println("All Reservations:");
+            for (Reservation reservation : reservations) {
+                System.out.println(reservation);
+            }
+        }
+    }
+    public static void main(String[] args) {
+        HotelReservationSystem hotelSystem = new HotelReservationSystem();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\nHotel Reservation System");
+            System.out.println("1. View Available Rooms");
+            System.out.println("2. Search for a Room");
+            System.out.println("3. Make a Reservation");
+            System.out.println("4. View Reservations");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();  
+            switch (choice) {
+                case 1:
+                    hotelSystem.displayAvailableRooms();
+                    break;
+                case 2:
+                    System.out.print("Enter room category (Single/Double/Suite): ");
+                    String category = scanner.nextLine();
+                    if (hotelSystem.searchRoom(category)) {
+                        System.out.println("Room found in the " + category + " category.");
+                    } else {
+                        System.out.println("No available rooms found in this category.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter your name: ");
+                    String guestName = scanner.nextLine();
+                    System.out.print("Enter room category (Single/Double/Suite): ");
+                    String categoryForReservation = scanner.nextLine();
+                    hotelSystem.makeReservation(guestName, categoryForReservation);
+                    break;
+                case 4:
+                    hotelSystem.viewReservations();
+                    break;
+                case 5:
+                    System.out.println("Thank you for using the Hotel Reservation System. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
